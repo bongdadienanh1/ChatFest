@@ -1,14 +1,16 @@
-package com.chatfest.server.Handler;
+package com.chatfest.server.handler;
 
-import com.chatfest.common.transport.Message;
+import com.chatfest.common.transport.Request;
 import com.chatfest.common.util.codec.FastJsonCodec;
-import com.chatfest.server.Handler.MsgHandler.MessageHandlerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 public class ReadHandler implements Runnable {
+    private static Logger logger = LoggerFactory.getLogger(ReadHandler.class);
 
     private SelectionKey key;
     private SocketChannel socketChannel;
@@ -30,8 +32,13 @@ public class ReadHandler implements Runnable {
                 buffer.clear();
             }
             if (bytes != null && bytes.length != 0) {
-                Message message = FastJsonCodec.deserialize(bytes, Message.class);
-                MessageHandlerFactory.getMessageHandler(message, key);
+                Request request = FastJsonCodec.deserialize(bytes, Request.class);
+                RequestHandler handler = RequestHandlerFactory.getMessageHandler(request, key);
+                if (handler == null) {
+                    logger.error("bad request from {}", socketChannel);
+                } else {
+                    handler.handle();
+                }
             }
             // 重新加上READ标记
             key.interestOps(key.interestOps() | SelectionKey.OP_READ);

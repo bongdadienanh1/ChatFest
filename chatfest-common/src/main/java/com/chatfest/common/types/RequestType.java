@@ -1,6 +1,6 @@
 package com.chatfest.common.types;
 
-public enum MsgType {
+public enum RequestType {
     LOGIN(1, "login"),
     LOGOUT(2, "logout"),
     SINGLE(3, "single"),
@@ -9,7 +9,7 @@ public enum MsgType {
     private int code;
     private String description;
 
-    MsgType(int code, String desciption) {
+    RequestType(int code, String desciption) {
         this.code = code;
         this.description = desciption;
     }

@@ -1,25 +1,24 @@
 package com.chatfest.common.transport;
 
-import com.chatfest.common.domain.User;
-import com.chatfest.common.types.MsgType;
+import com.chatfest.common.types.RequestType;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class Message implements Serializable {
+public class Request implements Serializable {
 
     private static final long serialVersionUID = -2821427368528745569L;
 
-    private User from;
-    private User to;
-    private MsgType type;
+    private String from;
+    private String to;
+    private RequestType type;
     private Date date;
     private byte[] body;
 
-    public Message() {
+    public Request() {
     }
 
-    public Message(User from, User to, MsgType type, Date date, byte[] body) {
+    public Request(String from, String to, RequestType type, Date date, byte[] body) {
         this.from = from;
         this.to = to;
         this.type = type;
@@ -27,27 +26,27 @@ public class Message implements Serializable {
         this.body = body;
     }
 
-    public User getFrom() {
+    public String getFrom() {
         return from;
     }
 
-    public void setFrom(User from) {
+    public void setFrom(String from) {
         this.from = from;
     }
 
-    public User getTo() {
+    public String getTo() {
         return to;
     }
 
-    public void setTo(User to) {
+    public void setTo(String to) {
         this.to = to;
     }
 
-    public MsgType getType() {
+    public RequestType getType() {
         return type;
     }
 
-    public void setType(MsgType type) {
+    public void setType(RequestType type) {
         this.type = type;
     }
 

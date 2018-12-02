@@ -1,7 +1,7 @@
 package com.chatfest.server;
 
-import com.chatfest.server.Handler.AcceptHandler;
-import com.chatfest.server.Handler.ReadHandler;
+import com.chatfest.server.handler.AcceptHandler;
+import com.chatfest.server.handler.ReadHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,11 +15,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ServerStarter {
-    private Logger logger = LoggerFactory.getLogger(ServerStarter.class);
+    private static Logger logger = LoggerFactory.getLogger(ServerStarter.class);
     private static final int PORT = 10010;
     private ServerSocketChannel serverSocketChannel;
     private Selector selector;
-    private ListenThread listenThread;
+    private Thread listenThread;
     private ExecutorService handleReadPool;
 
     public ServerStarter() {
@@ -38,7 +38,7 @@ public class ServerStarter {
             // 注册到选择器
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             // listen线程
-            listenThread = new ListenThread();
+            listenThread = new Thread(new ListenThread());
             // read线程池
             handleReadPool = Executors.newFixedThreadPool(10);
 
@@ -47,9 +47,19 @@ public class ServerStarter {
         }
     }
 
+    /**
+     * 开启服务器
+     */
+    private void lunch() {
+        listenThread.start();
+    }
+
+    /**
+     * 关闭服务器
+     */
     private void shundown() {
 
-        listenThread.shutDown();
+        listenThread.interrupt();
     }
 
     private class ListenThread implements Runnable {
@@ -69,7 +79,7 @@ public class ServerStarter {
                         // 必须删除已处理的key
                         it.remove();
                         if (key.isAcceptable()) {
-                            // 处理ACCEPT
+                            // 处理ACCEPT,新建客户端通道并注册到selector上
                             SocketChannel client = new AcceptHandler(key).handle();
                             if (client != null) {
                                 logger.info("connect from {}", client);
@@ -85,10 +95,6 @@ public class ServerStarter {
                     e.printStackTrace();
                 }
             }
-        }
-
-        public void shutDown() {
-            Thread.currentThread().interrupt();
         }
     }
 }
