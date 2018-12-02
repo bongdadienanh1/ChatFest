@@ -1,10 +1,12 @@
 package com.chatfest.common.types;
 
 public enum RequestType {
+
     LOGIN(1, "login"),
     LOGOUT(2, "logout"),
     SINGLE(3, "single"),
-    MULTIPLE(4, "multiple");
+    MULTIPLE(4, "multiple"),
+    QUERY(5, "query");
 
     private int code;
     private String description;

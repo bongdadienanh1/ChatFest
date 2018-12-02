@@ -2,10 +2,12 @@ package com.chatfest.common.types;
 
 public enum ResponseStatus {
 
-    LOGIN_SUCCESS(001, "login_success"),
-    LOGIN_FAIL(002, "login_fail"),
-    SEND_MSG_SUCCESS(010, "send_msg_success"),
-    SEND_MSG_FAIL(020, "send_msg_fail");
+    LOGIN_SUCCESS(681000, "login_success"),
+    LOGIN_FAIL(682000, "login_fail"),
+    SEND_MSG_SUCCESS(680100, "send_msg_success"),
+    SEND_MSG_FAIL(680200, "send_msg_fail"),
+    LOGOUT_SUCCESS(680010, "logout_success"),
+    SYSTEM_PROMPT(680001, "system_prompt");
 
     private int code;
     private String msg;

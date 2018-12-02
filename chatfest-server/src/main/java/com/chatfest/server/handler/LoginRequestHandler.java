@@ -27,15 +27,22 @@ public class LoginRequestHandler extends RequestHandler {
         String username = request.getFrom();
         String password = new String(request.getBody(), StandardCharsets.UTF_8);
         if (UserManager.checkLogin(username, password)) {
+            // 在线人数加一
+            onlineUsers.incrementAndGet();
+
             Response response = Response.build()
                     .responseStatus(ResponseStatus.LOGIN_SUCCESS)
-                    .body(null);
+                    .body(null)
+                    .from("SYSTEM");
             byte[] bytes = FastJsonCodec.serialize(response);
             try {
                 client.write(ByteBuffer.wrap(bytes));
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // 广播登录消息
+            String message = "\"" + username + "\" has logged in!";
+            new SystemMsgHandler(key.selector()).broadcast(message);
         } else {
             Response response = Response.build()
                     .responseStatus(ResponseStatus.LOGIN_FAIL)

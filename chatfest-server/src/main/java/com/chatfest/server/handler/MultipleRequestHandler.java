@@ -14,7 +14,7 @@ public class MultipleRequestHandler extends RequestHandler {
     }
 
     @Override
-    void handle() {
+    public void handle() {
 
     }
 }

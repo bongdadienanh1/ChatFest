@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReadHandler implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(ReadHandler.class);
-
     private SelectionKey key;
     private SocketChannel socketChannel;
     private ByteBuffer buffer;
