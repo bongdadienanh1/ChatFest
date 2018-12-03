@@ -34,6 +34,6 @@ public class LogoutRequestHandler extends RequestHandler {
             e.printStackTrace();
         }
         String message = "\"" + username + "\" has logged out!";
-        new SystemMsgHandler(key.selector()).broadcast(message);
+        new SystemMsgHandler(key).broadcast(message);
     }
 }
