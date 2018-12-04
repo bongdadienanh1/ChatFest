@@ -33,19 +33,24 @@ public class Response implements Serializable {
         return new Response(new Date());
     }
 
+    public Response from(String from) {
+        this.from = from;
+        return this;
+    }
+
     public Response responseStatus(ResponseStatus status) {
         this.status = status;
+        return this;
+    }
+
+    public Response date(Date date) {
+        this.date = date;
         return this;
     }
 
     public Response body(byte[] body) {
         this.body = body;
 
-        return this;
-    }
-
-    public Response from(String from) {
-        this.from = from;
         return this;
     }
 

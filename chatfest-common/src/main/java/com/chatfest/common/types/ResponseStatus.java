@@ -8,7 +8,9 @@ public enum ResponseStatus {
     SEND_MSG_FAIL(680200, "send_msg_fail"),
     RCV_MSG(680300, "rsv_msg"),
     LOGOUT_SUCCESS(680010, "logout_success"),
+    LOGOUT_FAIL(680020, "logout_fail"),
     SYSTEM_PROMPT(680001, "system_prompt");
+
     private int code;
     private String msg;
 
@@ -32,4 +34,5 @@ public enum ResponseStatus {
     public void setMsg(String msg) {
         this.msg = msg;
     }
+
 }

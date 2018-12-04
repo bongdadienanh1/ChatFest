@@ -9,6 +9,7 @@ public class Request implements Serializable {
 
     private static final long serialVersionUID = -2821427368528745569L;
 
+    private Long length;
     private String from;
     private String to;
     private RequestType type;
@@ -18,12 +19,46 @@ public class Request implements Serializable {
     public Request() {
     }
 
-    public Request(String from, String to, RequestType type, Date date, byte[] body) {
+    public Request(Date date) {
+        this.date = date;
+    }
+
+    public Request(Long length, String from, String to, RequestType type, Date date, byte[] body) {
+        this.length = length;
         this.from = from;
         this.to = to;
         this.type = type;
         this.date = date;
         this.body = body;
+    }
+
+    public static Request build() {
+        return new Request(new Date());
+    }
+
+    public Request from(String from) {
+        this.from = from;
+        return this;
+    }
+
+    public Request to(String to) {
+        this.to = to;
+        return this;
+    }
+
+    public Request type(RequestType type) {
+        this.type = type;
+        return this;
+    }
+
+    public Request date(Date date) {
+        this.date = date;
+        return this;
+    }
+
+    public Request body(byte[] body) {
+        this.body = body;
+        return this;
     }
 
     public String getFrom() {
