@@ -1,14 +1,14 @@
 package com.chatfest.server.handler;
 
 import com.chatfest.common.transport.Request;
-import com.chatfest.common.util.codec.FastJsonCodec;
+import com.chatfest.common.util.codec.KryoCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReadHandler implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(ReadHandler.class);
@@ -26,13 +26,18 @@ public class ReadHandler implements Runnable {
     @Override
     public void run() {
         try {
-            while (socketChannel.read(buffer) >= 0) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int size;
+            // TODO nio粘包/半包问题的解决，此处按照一条消息一个read事件
+            while ((size = socketChannel.read(buffer)) > 0) {
                 buffer.flip();
-                bytes = buffer.array();
+                baos.write(buffer.array(), 0, size);
                 buffer.clear();
             }
+            bytes = baos.toByteArray();
+            baos.close();
             if (bytes != null && bytes.length != 0) {
-                Request request = FastJsonCodec.deserialize(bytes, Request.class);
+                Request request = KryoCodec.deserialize(bytes, Request.class);
                 RequestHandler handler = RequestHandlerFactory.getMessageHandler(request, key);
                 if (handler == null) {
                     logger.error("bad request from {}", socketChannel);

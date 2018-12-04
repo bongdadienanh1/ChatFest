@@ -35,21 +35,19 @@ public class UserManager {
         return onlineUsers.get(username);
     }
 
-    public static boolean login(String username, SelectionKey key) throws RepeatLoginException {
+    public static void login(String username, SelectionKey key) throws RepeatLoginException {
         if (onlineUsers.containsKey(username)) {
             throw new RepeatLoginException();
         } else {
             onlineUsers.put(username, key);
-            return true;
         }
     }
 
-    public boolean logout(String username, SelectionKey key) throws RepeatLogoutException {
+    public static void logout(String username, SelectionKey key) throws RepeatLogoutException {
         if (!onlineUsers.containsKey(username)) {
             throw new RepeatLogoutException();
         } else {
             onlineUsers.remove(username);
-            return true;
         }
     }
 }

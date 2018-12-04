@@ -11,27 +11,26 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerStarter {
     private static Logger logger = LoggerFactory.getLogger(ServerStarter.class);
-    private static final int PORT = 10010;
+    private static final int DEFAULT_PORT = 10010;
     private ServerSocketChannel serverSocketChannel;
     private Selector selector;
     private Thread listenThread;
     private ExecutorService handleReadPool;
 
-    public ServerStarter() {
-        logger.info("server is starting...");
-        init();
+    public ServerStarter(int port) {
+        init(port);
     }
 
-    private void init() {
+    private void init(int port) {
         try {
             // 服务器通道
-            serverSocketChannel = ServerSocketChannel.open().bind(new InetSocketAddress(PORT));
+            serverSocketChannel = ServerSocketChannel.open().bind(new InetSocketAddress(port));
             // 非阻塞模式
             serverSocketChannel.configureBlocking(false);
             // 选择器
@@ -42,7 +41,7 @@ public class ServerStarter {
             listenThread = new Thread(new ListenThread());
             // read线程池
             handleReadPool = Executors.newFixedThreadPool(10);
-
+            logger.info("Server is running on {}", serverSocketChannel.getLocalAddress());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -51,15 +50,14 @@ public class ServerStarter {
     /**
      * 开启服务器
      */
-    private void lunch() {
+    private void launch() {
         listenThread.start();
     }
 
     /**
      * 关闭服务器
      */
-    private void shundown() {
-
+    private void shutdown() {
         listenThread.interrupt();
     }
 
@@ -95,6 +93,24 @@ public class ServerStarter {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        ServerStarter server;
+        if (args.length == 0) {
+            server = new ServerStarter(DEFAULT_PORT);
+        } else {
+            server = new ServerStarter(Integer.parseInt(args[0]));
+        }
+        server.launch();
+        Scanner scanner = new Scanner(System.in, "UTF-8");
+        while (scanner.hasNext()) {
+            String next = scanner.next();
+            if (next.equalsIgnoreCase("q")) {
+                server.shutdown();
+                logger.info("server is shutdown now");
             }
         }
     }

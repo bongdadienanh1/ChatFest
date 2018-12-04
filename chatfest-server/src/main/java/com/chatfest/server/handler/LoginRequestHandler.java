@@ -29,13 +29,13 @@ public class LoginRequestHandler extends RequestHandler {
             new SystemMsgHandler(key).single("", ResponseStatus.LOGIN_SUCCESS);
             try {
                 UserManager.login(username, key);
+                // 广播登录消息
+                String message = "\"" + username + "\" has logged in!";
+                new SystemMsgHandler(key).broadcast(message);
             } catch (RepeatLoginException e) {
                 String msg = e.getMessage();
                 new SystemMsgHandler(key).single(msg, ResponseStatus.LOGIN_FAIL);
             }
-            // 广播登录消息
-            String message = "\"" + username + "\" has logged in!";
-            new SystemMsgHandler(key).broadcast(message);
         } else {
             new SystemMsgHandler(key).single("Your username or password may be wrong.", ResponseStatus.LOGIN_FAIL);
         }
