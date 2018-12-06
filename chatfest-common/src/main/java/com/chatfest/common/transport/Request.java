@@ -8,96 +8,44 @@ import java.util.Date;
 public class Request implements Serializable {
 
     private static final long serialVersionUID = -2821427368528745569L;
-
-    private Long length;
-    private String from;
-    private String to;
-    private RequestType type;
-    private Date date;
-    private byte[] body;
+    private RequestHeader header;
+    private String message;
 
     public Request() {
     }
 
-    public Request(Date date) {
-        this.date = date;
-    }
-
-    public Request(Long length, String from, String to, RequestType type, Date date, byte[] body) {
-        this.length = length;
-        this.from = from;
-        this.to = to;
-        this.type = type;
-        this.date = date;
-        this.body = body;
+    public Request(RequestHeader header, String message) {
+        this.header = header;
+        this.message = message;
     }
 
     public static Request build() {
-        return new Request(new Date());
+        return new Request();
     }
 
-    public Request from(String from) {
-        this.from = from;
+    public Request requestHeader(RequestHeader header) {
+        this.header = header;
         return this;
     }
 
-    public Request to(String to) {
-        this.to = to;
+    public Request message(String message) {
+        this.message = message;
         return this;
     }
 
-    public Request type(RequestType type) {
-        this.type = type;
-        return this;
+    public RequestHeader getHeader() {
+        return header;
     }
 
-    public Request date(Date date) {
-        this.date = date;
-        return this;
+    public void setHeader(RequestHeader header) {
+        this.header = header;
     }
 
-    public Request body(byte[] body) {
-        this.body = body;
-        return this;
+    public String getMessage() {
+        return message;
     }
 
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    public RequestType getType() {
-        return type;
-    }
-
-    public void setType(RequestType type) {
-        this.type = type;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public byte[] getBody() {
-        return body;
-    }
-
-    public void setBody(byte[] body) {
-        this.body = body;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

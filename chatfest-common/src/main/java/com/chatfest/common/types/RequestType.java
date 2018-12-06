@@ -2,25 +2,25 @@ package com.chatfest.common.types;
 
 public enum RequestType {
 
-    LOGIN(1, "login"),
-    LOGOUT(2, "logout"),
-    SINGLE(3, "single"),
-    MULTIPLE(4, "multiple"),
-    QUERY(5, "query");
+    LOGIN((byte) 1, "login"),
+    LOGOUT((byte) 2, "logout"),
+    SINGLE((byte) 3, "single"),
+    MULTIPLE((byte) 4, "multiple"),
+    QUERY((byte) 5, "query");
 
-    private int code;
+    private byte code;
     private String description;
 
-    RequestType(int code, String desciption) {
+    RequestType(byte code, String desciption) {
         this.code = code;
         this.description = desciption;
     }
 
-    public int getCode() {
+    public byte getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(byte code) {
         this.code = code;
     }
 

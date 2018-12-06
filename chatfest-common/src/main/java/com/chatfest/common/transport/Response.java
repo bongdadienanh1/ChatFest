@@ -12,7 +12,7 @@ public class Response implements Serializable {
     private String from;
     private ResponseStatus status;
     private Date date;
-    private byte[] body;
+    private byte[] message;
 
     private Response() {
 
@@ -22,11 +22,11 @@ public class Response implements Serializable {
         this.date = date;
     }
 
-    public Response(String from, ResponseStatus status, Date date, byte[] body) {
+    public Response(String from, ResponseStatus status, Date date, byte[] message) {
         this.from = from;
         this.status = status;
         this.date = date;
-        this.body = body;
+        this.message = message;
     }
 
     public static Response build() {
@@ -48,8 +48,8 @@ public class Response implements Serializable {
         return this;
     }
 
-    public Response body(byte[] body) {
-        this.body = body;
+    public Response message(byte[] message) {
+        this.message = message;
 
         return this;
     }
@@ -66,12 +66,12 @@ public class Response implements Serializable {
         this.status = status;
     }
 
-    public byte[] getBody() {
-        return body;
+    public byte[] getMessage() {
+        return message;
     }
 
-    public void setBody(byte[] body) {
-        this.body = body;
+    public void setMessage(byte[] message) {
+        this.message = message;
     }
 
     public String getFrom() {
