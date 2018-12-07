@@ -7,9 +7,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class RequestHandler {
 
-    protected Request request;
+    Request request;
     protected SelectionKey key;
-    protected static AtomicInteger onlineUsers = new AtomicInteger(0);
+    static AtomicInteger onlineUsers = new AtomicInteger(0);
 
     public RequestHandler() {
     }

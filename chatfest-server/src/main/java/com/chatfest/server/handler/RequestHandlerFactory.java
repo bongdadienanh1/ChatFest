@@ -8,8 +8,8 @@ import java.nio.channels.SelectionKey;
 public class RequestHandlerFactory {
 
     public static RequestHandler getMessageHandler(Request request, SelectionKey key) {
-        RequestType type = request.getType();
-        switch (type.getCode()) {
+        byte type = request.getHeader().getType();
+        switch (type) {
             case 1:
                 return new LoginRequestHandler(request, key);
             case 2:

@@ -1,7 +1,8 @@
 package com.chatfest.server.handler;
 
+import com.chatfest.common.transport.Properties;
 import com.chatfest.common.transport.Request;
-import com.chatfest.common.util.codec.KryoCodec;
+import com.chatfest.common.transport.RequestCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,30 +15,33 @@ public class ReadHandler implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(ReadHandler.class);
     private SelectionKey key;
     private SocketChannel socketChannel;
-    private ByteBuffer buffer;
-    private byte[] bytes;
 
     public ReadHandler(SelectionKey key) {
         this.key = key;
         this.socketChannel = (SocketChannel) key.channel();
-        buffer = ByteBuffer.allocate(1024);
     }
 
     @Override
     public void run() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteBuffer header = ByteBuffer.allocate(Properties.REQUEST_HEADER_LENGTH.getVal());
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int size;
-            // TODO nio粘包/半包问题的解决，此处按照一条消息一个read事件
-            while ((size = socketChannel.read(buffer)) > 0) {
-                buffer.flip();
-                baos.write(buffer.array(), 0, size);
-                buffer.clear();
+            while (header.hasRemaining()) {
+                socketChannel.read(header);
             }
-            bytes = baos.toByteArray();
+            header.flip();
+            baos.write(header.array());
+            int bodyLength = RequestCodec.getBodyLength(header.array());
+            ByteBuffer body = ByteBuffer.allocate(bodyLength);
+            while (body.hasRemaining()) {
+                socketChannel.read(body);
+            }
+            body.flip();
+            baos.write(body.array());
+            byte[] bytes = baos.toByteArray();
             baos.close();
             if (bytes != null && bytes.length != 0) {
-                Request request = KryoCodec.deserialize(bytes, Request.class);
+                Request request = RequestCodec.deserialize(bytes);
                 RequestHandler handler = RequestHandlerFactory.getMessageHandler(request, key);
                 if (handler == null) {
                     logger.error("bad request from {}", socketChannel);

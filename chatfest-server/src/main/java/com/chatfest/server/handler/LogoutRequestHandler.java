@@ -1,7 +1,7 @@
 package com.chatfest.server.handler;
 
 import com.chatfest.common.transport.Request;
-import com.chatfest.common.types.ResponseStatus;
+import com.chatfest.common.types.ResponseType;
 import com.chatfest.server.Exceptions.RepeatLogoutException;
 import com.chatfest.server.manager.UserManager;
 
@@ -20,15 +20,15 @@ public class LogoutRequestHandler extends RequestHandler {
     @Override
     public void handle() {
         SocketChannel client = (SocketChannel) key.channel();
-        String username = request.getFrom();
+        String username = request.getHeader().getFrom();
         onlineUsers.decrementAndGet();
-        new SystemMsgHandler(key).single("Log out success", ResponseStatus.LOGOUT_SUCCESS);
+        new SystemMsgHandler(key).single("Log out success", ResponseType.LOGOUT_SUCCESS.getCode());
         try {
             UserManager.logout(username, key);
             String message = "\"" + username + "\" has logged out!";
-            new SystemMsgHandler(key).broadcast(message);
+            new SystemMsgHandler(key).broadcast(message, ResponseType.SYSTEM_PROMPT.getCode());
         } catch (RepeatLogoutException e) {
-            new SystemMsgHandler(key).single(e.getMessage(), ResponseStatus.LOGOUT_FAIL);
+            new SystemMsgHandler(key).single(e.getMessage(), ResponseType.LOGOUT_FAIL.getCode());
         }
     }
 }

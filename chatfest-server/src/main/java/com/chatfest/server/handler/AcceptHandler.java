@@ -23,5 +23,4 @@ public class AcceptHandler {
             return null;
         }
     }
-
 }
