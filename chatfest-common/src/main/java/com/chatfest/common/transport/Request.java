@@ -1,22 +1,11 @@
 package com.chatfest.common.transport;
 
-import com.chatfest.common.types.RequestType;
+public class Request {
 
-import java.io.Serializable;
-import java.util.Date;
-
-public class Request implements Serializable {
-
-    private static final long serialVersionUID = -2821427368528745569L;
     private RequestHeader header;
     private String message;
 
-    public Request() {
-    }
-
-    public Request(RequestHeader header, String message) {
-        this.header = header;
-        this.message = message;
+    private Request() {
     }
 
     public static Request build() {

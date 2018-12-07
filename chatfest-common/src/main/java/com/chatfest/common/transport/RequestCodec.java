@@ -1,13 +1,17 @@
 package com.chatfest.common.transport;
 
-import com.chatfest.common.transport.Request;
-import com.chatfest.common.transport.RequestHeader;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class RequestCodec {
+
+    public static int getBodyLength(byte[] bytes) {
+        return intFrom4Bytes(bytes, 26);
+    }
+
     public static Request deserialize(byte[] bytes) {
         byte type = bytes[1];
         String from = new String(bytes, 2, 8);
@@ -24,31 +28,34 @@ public class RequestCodec {
         return Request.build()
                 .requestHeader(header)
                 .message(message);
-
     }
 
-    public static byte[] serialize(Request request) throws Exception {
+    public static byte[] serialize(Request request) {
         RequestHeader header = request.getHeader();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         baos.write(RequestHeader.MAGIC);
         baos.write(header.getType());
         String from = header.getFrom();
         String to = header.getTo();
-        baos.write(from.getBytes());
-        for (int i = 0; i < 8 - from.length(); i++) {
-            baos.write('\n');
+        try {
+            baos.write(from.getBytes());
+            for (int i = 0; i < 8 - from.length(); i++) {
+                baos.write('\n');
+            }
+            baos.write(to.getBytes());
+            for (int i = 0; i < 8 - to.length(); i++) {
+                baos.write('\n');
+            }
+            baos.write(longTo8Bytes(header.getTimestamp()));
+            baos.write(intTo4Bytes(header.getContentLength()));
+            baos.write(request.getMessage().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        baos.write(to.getBytes());
-        for (int i = 0; i < 8 - to.length(); i++) {
-            baos.write('\n');
-        }
-        baos.write(longTo8Bytes(header.getTimestamp()));
-        baos.write(intTo4Bytes(request.getMessage().length()));
-        baos.write(request.getMessage().getBytes());
         return baos.toByteArray();
     }
 
-    private static byte[] intTo4Bytes(int v) {
+    static byte[] intTo4Bytes(int v) {
         byte[] res = new byte[4];
         res[0] = (byte) (v >>> 24);
         res[1] = (byte) (v >>> 16);
@@ -57,7 +64,7 @@ public class RequestCodec {
         return res;
     }
 
-    private static byte[] longTo8Bytes(long v) {
+    static byte[] longTo8Bytes(long v) {
         byte[] res = new byte[8];
         for (int i = 0; i < 8; i++) {
             res[i] = (byte) (v >>> ((7 - i) * 8));
@@ -65,7 +72,7 @@ public class RequestCodec {
         return res;
     }
 
-    private static int intFrom4Bytes(byte[] bytes, int offset) {
+    static int intFrom4Bytes(byte[] bytes, int offset) {
         int res = 0;
         for (int i = offset; i < offset + 4; i++) {
             res |= ((bytes[i] & 0xFF) << (3 - i) * 8);
@@ -73,7 +80,7 @@ public class RequestCodec {
         return res;
     }
 
-    private static long longFrom8Bytes(byte[] bytes, int offset) {
+    static long longFrom8Bytes(byte[] bytes, int offset) {
         long res = 0;
         for (int i = offset; i < offset + 8; i++) {
             res |= ((bytes[i] & 0xFFL) << (7 - i) * 8);
