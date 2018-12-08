@@ -1,7 +1,7 @@
 package com.chatfest.client;
 
 import com.chatfest.common.transport.Request;
-import com.chatfest.common.util.codec.KryoCodec;
+import com.chatfest.common.transport.RequestCodec;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -22,10 +22,15 @@ public class RequestSender implements Runnable {
 
     @Override
     public void run() {
-        try {
-            channel.write(ByteBuffer.wrap(KryoCodec.serialize(request)));
-        } catch (IOException e) {
-            e.printStackTrace();
+        byte[] bytes = RequestCodec.serialize(request);
+        ByteBuffer buf = ByteBuffer.wrap(bytes);
+        // write() 非阻塞
+        while (buf.hasRemaining()) {
+            try {
+                channel.write(buf);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 }
