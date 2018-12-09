@@ -5,7 +5,7 @@ public class RepeatLoginException extends Exception {
     private static final long serialVersionUID = 5183001384087222695L;
 
     public RepeatLoginException() {
-        super("Your account has logged in!");
+        super("Can't repeat login!");
     }
 
     public RepeatLoginException(String message) {
