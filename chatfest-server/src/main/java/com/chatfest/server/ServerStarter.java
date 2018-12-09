@@ -17,11 +17,16 @@ import java.util.concurrent.Executors;
 
 public class ServerStarter {
     private static Logger logger = LoggerFactory.getLogger(ServerStarter.class);
-    private static final int DEFAULT_PORT = 10010;
+    // 服务器默认端口
+    public static final int DEFAULT_PORT = 10010;
+    // 服务器监听套接字
     private ServerSocketChannel serverSocketChannel;
+    // 选择器
     private Selector selector;
-    private Thread listenThread;
-    private ExecutorService handleReadPool;
+    // 接收请求线程
+    private Thread requestRecvThread;
+    // 处理用户消息线程池
+    private ExecutorService handleMsgPool;
 
     public ServerStarter(int port) {
         init(port);
@@ -29,18 +34,12 @@ public class ServerStarter {
 
     private void init(int port) {
         try {
-            // 服务器通道
             serverSocketChannel = ServerSocketChannel.open().bind(new InetSocketAddress(port));
-            // 非阻塞模式
             serverSocketChannel.configureBlocking(false);
-            // 选择器
             selector = Selector.open();
-            // 注册到选择器
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-            // listen线程
-            listenThread = new Thread(new ListenThread());
-            // read线程池
-            handleReadPool = Executors.newFixedThreadPool(10);
+            requestRecvThread = new Thread(new RequestRecvThread());
+            handleMsgPool = Executors.newFixedThreadPool(10);
             logger.info("Server is running on {}", serverSocketChannel.getLocalAddress());
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,25 +50,23 @@ public class ServerStarter {
      * 开启服务器
      */
     private void launch() {
-        listenThread.start();
+        requestRecvThread.start();
     }
 
     /**
      * 关闭服务器
      */
     private void shutdown() {
-        listenThread.interrupt();
+        requestRecvThread.interrupt();
     }
 
-    private class ListenThread implements Runnable {
+    private class RequestRecvThread implements Runnable {
 
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    // 每次阻塞1000ms
                     if (selector.select(1000) == 0) {
-                        System.out.print(".");
                         continue;
                     }
                     Iterator<SelectionKey> it = selector.selectedKeys().iterator();
@@ -87,7 +84,7 @@ public class ServerStarter {
                             // 处理READ
                             // 因为是新开线程处理READ，所以要将此key的READ标记去掉，在线程结束时重新加上（避免重复处理）
                             key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
-                            handleReadPool.execute(new ReadHandler(key));
+                            handleMsgPool.execute(new ReadHandler(key));
                         }
                     }
                 } catch (Exception e) {
