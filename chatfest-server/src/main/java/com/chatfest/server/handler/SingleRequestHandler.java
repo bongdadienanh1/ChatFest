@@ -20,11 +20,11 @@ public class SingleRequestHandler extends RequestHandler {
 
         SelectionKey recver = UserManager.getKey(to);
         if (recver == null) {
-            String msg = "\"" + to + "\" is offline.";
+            String msg = "\"" + to + "\" is offline！";
             new SystemMsgHandler(key).single(msg, ResponseType.SEND_MSG_FAIL.getCode());
         } else {
-            new SystemMsgHandler(key).single("send msg success!", ResponseType.SEND_MSG_SUCCESS.getCode());
-            new SystemMsgHandler(recver).single(message, from, ResponseType.RCV_MSG.getCode());
+            new SystemMsgHandler(key).single("Message sent!", ResponseType.SEND_MSG_SUCCESS.getCode());
+            new SystemMsgHandler(recver).single(message, from, ResponseType.RECV_MSG.getCode());
         }
 
     }

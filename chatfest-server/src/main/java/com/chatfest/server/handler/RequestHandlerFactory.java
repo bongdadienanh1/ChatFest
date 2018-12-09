@@ -9,17 +9,16 @@ public class RequestHandlerFactory {
 
     public static RequestHandler getMessageHandler(Request request, SelectionKey key) {
         byte type = request.getHeader().getType();
-        switch (type) {
-            case 1:
-                return new LoginRequestHandler(request, key);
-            case 2:
-                return new LogoutRequestHandler(request, key);
-            case 3:
-                return new SingleRequestHandler(request, key);
-            case 4:
-                return new MultipleRequestHandler(request, key);
-            default:
-                return null;
+        if (type == RequestType.LOGIN.getCode()) {
+            return new LoginRequestHandler(request, key);
+        } else if (type == RequestType.LOGOUT.getCode()) {
+            return new LogoutRequestHandler(request, key);
+        } else if (type == RequestType.SINGLE.getCode()) {
+            return new SingleRequestHandler(request, key);
+        } else if (type == RequestType.MULTIPLE.getCode()) {
+            return new MultipleRequestHandler(request, key);
+        } else {
+            return null;
         }
     }
 }

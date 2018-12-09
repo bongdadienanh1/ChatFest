@@ -4,11 +4,13 @@ import com.chatfest.common.transport.Response;
 import com.chatfest.common.transport.ResponseCodec;
 import com.chatfest.common.transport.ResponseHeader;
 import com.chatfest.common.types.ResponseType;
+import com.chatfest.server.manager.UserManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -36,23 +38,25 @@ public class SystemMsgHandler {
         send(response, key);
     }
 
-    public void broadcast(String message, byte type) {
-        broadcast(message, "SYSTEM", type);
+    public void broadcast(String message, byte type, SelectionKey key) {
+        broadcast(message, "SYSTEM", type, key);
     }
 
-    public void broadcast(String message, String from, byte type) {
-        Set<SelectionKey> keys = key.selector().keys();
+    public void broadcast(String message, String from, byte type, SelectionKey key) {
+        Collection<SelectionKey> keys = UserManager.getKeys();
         Iterator<SelectionKey> it = keys.iterator();
         ResponseHeader header = ResponseHeader.build()
-                .type(ResponseType.SYSTEM_PROMPT.getCode())
+                .type(type)
                 .from(from)
                 .contentLength(message.length());
         Response response = Response.build()
                 .responseHeader(header)
                 .message(message);
         while (it.hasNext()) {
-            SelectionKey key = it.next();
-            send(response, key);
+            SelectionKey to = it.next();
+            if (to != key) {
+                send(response, to);
+            }
         }
     }
 

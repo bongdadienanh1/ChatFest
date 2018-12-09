@@ -16,8 +16,8 @@ public class MultipleRequestHandler extends RequestHandler {
         String from = request.getHeader().getFrom();
         String message = request.getMessage();
         // 响应
-        new SystemMsgHandler(key).single("send msg success", ResponseType.SEND_MSG_SUCCESS.getCode());
+        new SystemMsgHandler(key).single("Message sent!", ResponseType.SEND_MSG_SUCCESS.getCode());
         // 群发
-        new SystemMsgHandler(key).broadcast(message, from, ResponseType.RCV_MSG.getCode());
+        new SystemMsgHandler(key).broadcast(message, from, ResponseType.RECV_MSG.getCode(), key);
     }
 }

@@ -9,7 +9,7 @@ public abstract class RequestHandler {
 
     Request request;
     protected SelectionKey key;
-    static AtomicInteger onlineUsers = new AtomicInteger(0);
+
 
     public RequestHandler() {
     }

@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ReadHandler implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(ReadHandler.class);
@@ -29,7 +30,6 @@ public class ReadHandler implements Runnable {
             while (header.hasRemaining()) {
                 socketChannel.read(header);
             }
-            header.flip();
             baos.write(header.array());
             int bodyLength = RequestCodec.getBodyLength(header.array());
             ByteBuffer body = ByteBuffer.allocate(bodyLength);
@@ -50,7 +50,10 @@ public class ReadHandler implements Runnable {
                 }
             }
             // 重新加上READ标记
-            key.interestOps(key.interestOps() | SelectionKey.OP_READ);
+            if (key.isValid()) {
+                key.interestOps(key.interestOps() | SelectionKey.OP_READ);
+                key.selector().wakeup();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

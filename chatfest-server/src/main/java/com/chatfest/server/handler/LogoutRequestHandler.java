@@ -19,16 +19,17 @@ public class LogoutRequestHandler extends RequestHandler {
 
     @Override
     public void handle() {
-        SocketChannel client = (SocketChannel) key.channel();
         String username = request.getHeader().getFrom();
-        onlineUsers.decrementAndGet();
-        new SystemMsgHandler(key).single("Log out success", ResponseType.LOGOUT_SUCCESS.getCode());
+        UserManager.onlineUserNum.decrementAndGet();
+        String message = "You logged out! (Online:" + UserManager.onlineUserNum + ")";
+        new SystemMsgHandler(key).single(message, ResponseType.LOGOUT_SUCCESS.getCode());
         try {
-            UserManager.logout(username, key);
-            String message = "\"" + username + "\" has logged out!";
-            new SystemMsgHandler(key).broadcast(message, ResponseType.SYSTEM_PROMPT.getCode());
+            UserManager.logout(username);
+            message = "[" + username + "] logged out! (Online:" + UserManager.onlineUserNum + ")";
+            new SystemMsgHandler(key).broadcast(message, ResponseType.SYSTEM_PROMPT.getCode(), key);
         } catch (RepeatLogoutException e) {
             new SystemMsgHandler(key).single(e.getMessage(), ResponseType.LOGOUT_FAIL.getCode());
         }
+        key.cancel();
     }
 }
