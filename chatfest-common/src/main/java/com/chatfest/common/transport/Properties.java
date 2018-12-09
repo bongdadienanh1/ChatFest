@@ -1,7 +1,8 @@
 package com.chatfest.common.transport;
 
 public enum Properties {
-    REQUEST_HEADER_LENGTH(30);
+    REQUEST_HEADER_LENGTH(30),
+    RESPONSE_HEADER_LENGTH(22);
 
     private int val;
 

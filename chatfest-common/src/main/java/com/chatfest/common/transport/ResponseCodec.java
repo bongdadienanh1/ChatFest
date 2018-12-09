@@ -1,9 +1,16 @@
 package com.chatfest.common.transport;
 
+import com.chatfest.common.util.TransportUtil;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ResponseCodec {
+
+    public static int getBodyLength(byte[] bytes) {
+        return TransportUtil.intFrom4Bytes(bytes, 18);
+    }
+
     public static byte[] serialize(Response response) {
         ResponseHeader header = response.getHeader();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -15,8 +22,8 @@ public class ResponseCodec {
             for (int i = 0; i < 8 - from.length() ; i++) {
                 baos.write('\n');
             }
-            baos.write(RequestCodec.longTo8Bytes(header.getTimestamp()));
-            baos.write(RequestCodec.intTo4Bytes(header.getContentLength()));
+            baos.write(TransportUtil.longTo8Bytes(header.getTimestamp()));
+            baos.write(TransportUtil.intTo4Bytes(header.getContentLength()));
             baos.write(response.getMessage().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -26,10 +33,10 @@ public class ResponseCodec {
 
     public static Response deserialize(byte[] bytes) {
         byte type = bytes[1];
-        String from = new String(bytes, 2, 8);
-        long timestamp = RequestCodec.longFrom8Bytes(bytes, 10);
-        int length = RequestCodec.intFrom4Bytes(bytes, 18);
-        String message = new String(bytes, 19, length);
+        String from = TransportUtil.getUserName(bytes, 2);
+        long timestamp = TransportUtil.longFrom8Bytes(bytes, 10);
+        int length = TransportUtil.intFrom4Bytes(bytes, 18);
+        String message = new String(bytes, 22, length);
         ResponseHeader header = ResponseHeader.build()
                 .type(type)
                 .from(from)
